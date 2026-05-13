@@ -10,7 +10,7 @@ window.addEventListener('scroll', () => {
 
 // ─── MOBILE HAMBURGER ────────────────────────
 const hamburger = document.getElementById('hamburger');
-const navLinks  = document.getElementById('nav-links');
+const navLinks = document.getElementById('nav-links');
 hamburger.addEventListener('click', () => {
   const open = navLinks.classList.toggle('open');
   hamburger.setAttribute('aria-expanded', open);
@@ -106,7 +106,7 @@ window.addEventListener('scroll', () => {
 // ─── FORM SUBMISSION ────────────────────────
 function handleSubmit(e) {
   e.preventDefault();
-  const btn  = document.getElementById('btn-submit');
+  const btn = document.getElementById('btn-submit');
   const text = document.getElementById('btn-submit-text');
   const icon = document.getElementById('btn-submit-icon');
 
@@ -124,7 +124,7 @@ function resetForm() {
   document.getElementById('contact-form').reset();
   document.getElementById('contact-form').classList.remove('hidden');
   document.getElementById('form-success').classList.add('hidden');
-  const btn  = document.getElementById('btn-submit');
+  const btn = document.getElementById('btn-submit');
   document.getElementById('btn-submit-text').textContent = 'Enviar Solicitud';
   document.getElementById('btn-submit-icon').textContent = '→';
   btn.disabled = false;
@@ -134,8 +134,8 @@ function resetForm() {
 document.querySelectorAll('.service-card').forEach(card => {
   card.addEventListener('mousemove', e => {
     const rect = card.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width  - 0.5;
-    const y = (e.clientY - rect.top)  / rect.height - 0.5;
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
     card.style.transform = `translateY(-6px) rotateX(${-y * 4}deg) rotateY(${x * 4}deg)`;
   });
   card.addEventListener('mouseleave', () => {
@@ -166,7 +166,7 @@ function filterDoctors() {
     if (matchesSearch && matchesFilter) {
       card.classList.remove('hidden-doctor');
       // Re-trigger reveal animation check
-      card.classList.add('visible'); 
+      card.classList.add('visible');
     } else {
       card.classList.add('hidden-doctor');
     }
@@ -421,6 +421,100 @@ const doctorsData = {
   }
 };
 
+// ─── PACIENTE INFO DATA ──────────────────────
+const pacienteInfoData = {
+  'agendar': {
+    title: 'Agendar Hora',
+    desc: 'Ponemos a su disposición múltiples canales para agendar su cita de la manera más cómoda para usted.',
+    details: [
+      'Reserva en línea a través de nuestra plataforma 24/7.',
+      'Contacto directo vía WhatsApp para agendamiento rápido.',
+      'Atención telefónica personalizada de Lunes a Viernes.',
+      'Recordatorios de cita automáticos vía SMS o correo.'
+    ]
+  },
+  'presupuesto': {
+    title: 'Presupuesto',
+    desc: 'Solicite un presupuesto detallado para sus procedimientos quirúrgicos o exámenes diagnósticos.',
+    details: [
+      'Presupuestos transparentes sin costos ocultos.',
+      'Detalle de insumos, honorarios médicos y derechos de sala.',
+      'Opciones de financiamiento y facilidades de pago.',
+      'Vigencia de presupuestos por 30 días.'
+    ]
+  },
+  'pagos': {
+    title: 'Medios de Pago',
+    desc: 'Ofrecemos diversas alternativas para facilitar el pago de sus prestaciones médicas.',
+    details: [
+      'Tarjetas de Crédito y Débito (Webpay/Transbank).',
+      'Transferencia electrónica bancaria.',
+      'Efectivo directamente en nuestras sucursales.',
+      'Convenios vigentes con Isapres y Fonasa (según prestación).'
+    ]
+  },
+  'quirurgica': {
+    title: 'Información Quirúrgica',
+    desc: 'Guía básica para pacientes que se someterán a procedimientos quirúrgicos en nuestra clínica.',
+    details: [
+      'Traer carnet físico vigente',
+      'Orden médica del especialista',
+      'Venir con un acompañante',
+      'Mínimo 6 horas de ayuno o según recomendación del especialista'
+    ]
+  },
+  'derechos': {
+    title: 'Derechos y Deberes',
+    desc: 'Conozca el marco legal y ético que rige la relación entre el paciente y nuestro equipo de salud.',
+    details: [
+      'Derecho a recibir una atención digna y de calidad.',
+      'Derecho a la privacidad de sus datos y confidencialidad médica.',
+      'Deber de entregar información veraz sobre su estado de salud.',
+      'Deber de tratar con respeto al personal de la institución.'
+    ]
+  },
+  'reclamos': {
+    title: 'Reclamos y Sugerencias',
+    desc: 'Su opinión nos ayuda a mejorar continuamente nuestros estándares de servicio.',
+    details: [
+      'Buzón de sugerencias digital y presencial.',
+      'Procedimiento formal de gestión de reclamos.',
+      'Tiempos de respuesta garantizados por la dirección climica.',
+      'Encuestas de satisfacción post-atención.'
+    ]
+  },
+  'testimonios': {
+    title: 'Testimonios',
+    desc: 'Historias reales de pacientes que han recuperado su calidad de vida tras tratarse en Visum.',
+    details: [
+      'Casos de éxito en cirugía refractiva y cataratas.',
+      'Experiencias de pacientes en tratamiento de glaucoma.',
+      'Reseñas certificadas sobre la atención del equipo médico.',
+      'Videos testimoniales sobre el impacto de recuperar la visión.'
+    ]
+  },
+  'examenes': {
+    title: 'Exámenes Pre operatorios',
+    desc: 'Realizamos todos los estudios necesarios para garantizar la seguridad y precisión de su procedimiento quirúrgico.',
+    details: [
+      'Topografía Corneal de alta resolución.',
+      'Biometría óptica IOL Master.',
+      'Microscopía Especular.',
+      'Paquimetría Ultrasónica.'
+    ]
+  },
+  'consultas': {
+    title: 'Consultas Médicas',
+    desc: 'Atención oftalmológica integral con especialistas de primer nivel.',
+    details: [
+      'Evaluación refractiva completa.',
+      'Examen de fondo de ojo.',
+      'Medición de presión intraocular.',
+      'Receta para lentes y certificados médicos.'
+    ]
+  }
+};
+
 // ─── MODAL CONTROLS ──────────────────────────
 const modal = document.getElementById('visum-modal');
 const modalInner = document.getElementById('modal-content');
@@ -429,7 +523,7 @@ function openModal(type, id = null) {
   modal.classList.add('active');
   modal.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
-  
+
   // Show loader initially
   modalInner.innerHTML = '<div class="modal-loader"><div class="loader-spinner"></div></div>';
 
@@ -453,8 +547,8 @@ window.addEventListener('keydown', (e) => {
 // Logic for Modal Content
 function fetchModalContent(type, id) {
   let content = '';
-  
-  switch(type) {
+
+  switch (type) {
     case 'doctor':
       const doc = doctorsData[id];
       if (doc) {
@@ -462,7 +556,7 @@ function fetchModalContent(type, id) {
           <div class="doctor-profile-modal">
             <div class="doctor-profile-header">
               <div class="doctor-profile-img">
-                <img src="${doc.img}" alt="${doc.name}">
+                <img src="https://www.visum.cl/content/uploads/2020/05/visum-doctor.jpg" alt="${doc.name}">
               </div>
               <div class="doctor-profile-info">
                 <h2 class="doctor-profile-name">${doc.name}</h2>
@@ -546,10 +640,30 @@ function fetchModalContent(type, id) {
         content = '<p>Información de patología no encontrada.</p>';
       }
       break;
+    case 'paciente-info':
+      const info = pacienteInfoData[id];
+      if (info) {
+        content = `
+          <h2 class="section-title">${info.title.split(' ').slice(0, -1).join(' ')} <span class="gradient-text">${info.title.split(' ').pop()}</span></h2>
+          <p class="section-desc">${info.desc}</p>
+          <div class="profile-section" style="margin-top: 24px;">
+            <h3>Información relevante:</h3>
+            <ul class="service-features" style="margin-top: 16px;">
+              ${info.details.map(detail => `<li>${detail}</li>`).join('')}
+            </ul>
+          </div>
+          <div class="modal-actions">
+            <a href="#contacto" class="btn btn-primary" onclick="closeModal()">Contactar ahora</a>
+          </div>
+        `;
+      } else {
+        content = '<p>Información no encontrada.</p>';
+      }
+      break;
     default:
       content = '<h2>Información</h2><p>Contenido en desarrollo...</p>';
   }
-  
+
   modalInner.innerHTML = `<div class="reveal visible">${content}</div>`;
 }
 
@@ -579,6 +693,21 @@ document.querySelectorAll('.btn-patologia').forEach(btn => {
       openModal('patologia', cardId);
     }
   });
+});
+
+document.querySelectorAll('.dropdown-content a').forEach(link => {
+  link.addEventListener('click', (e) => {
+    const infoId = link.getAttribute('href').replace('#', '');
+    if (pacienteInfoData[infoId]) {
+      e.preventDefault();
+      openModal('paciente-info', infoId);
+    }
+  });
+});
+
+document.getElementById('btn-servicios-hero')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  openModal('paciente-info', 'presupuesto');
 });
 
 // ─── INIT ────────────────────────────────────
