@@ -84,7 +84,8 @@
   --brand-800: #0f1c8a;
   --brand-900: #0b1470;
 
-  --dark-100: #84CBCE --dark-200: #1e293b;
+  --dark-100: #84CBCE;
+  --dark-200: #1e293b;
   --dark-300: #334155;
   --dark-400: #475569;
   --neutral-100: #f8fafc;
@@ -110,6 +111,7 @@
 }
 
 html {
+  overflow-x: hidden;
   scroll-behavior: smooth;
 }
 
@@ -118,6 +120,8 @@ body {
   color: var(--text-primary);
   background: var(--white);
   overflow-x: hidden;
+  width: 100%;
+  position: relative;
   line-height: 1.6;
 }
 
@@ -273,7 +277,7 @@ img {
   background: #00B49C;
   color: var(--white) !important;
   padding: 10px 22px;
-  font-size: 0.85rem;
+  font-size: 0.98rem;
 }
 
 .btn-nav:hover {
@@ -281,27 +285,30 @@ img {
   transform: translateY(-1px);
 }
 
-.btn-sustentabilidad {
+.btn-nav.btn-convenios {
   background: transparent;
   padding: 4px 16px;
   font-size: 0.75rem;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 100px;
 }
 
-.btn-sustentabilidad:hover {
+.btn-nav.btn-convenios:hover {
   background: #00B49C;
+  border-color: #00B49C;
 }
 
-.btn-sustentabilidad .leaf-icon {
+.btn-convenios svg {
   width: 14px;
   height: 14px;
   color: #009984;
   transition: var(--transition);
 }
 
-.btn-sustentabilidad:hover .leaf-icon {
+.btn-convenios:hover svg {
   color: var(--white);
 }
 
@@ -312,7 +319,7 @@ img {
 
 .btn-sm {
   padding: 8px 16px;
-  font-size: 0.8rem;
+  font-size: 1.2rem;
 }
 
 /* ─── REVEAL ANIMATIONS ─────────────────────── */
@@ -345,15 +352,16 @@ img {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 10px 0;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 15px;
 }
 
 .top-bar-left {
   display: flex;
   align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
+  gap: 2px;
+  flex-wrap: nowrap;
 }
 
 .top-bar-item {
@@ -414,7 +422,7 @@ img {
 /* ─── NAVBAR ────────────────────────────────── */
 .navbar {
   position: fixed;
-  top: 36px;
+  top: 50px;
   /* Offset for top bar */
   left: 0;
   right: 0;
@@ -426,8 +434,8 @@ img {
 
 .navbar.scrolled {
   top: 0;
-  background: #001b56d6;
-  backdrop-filter: blur(16px);
+  background: rgb(51 68 105 / 60%);
+  backdrop-filter: blur(10px);
   padding: 16px 0;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
 }
@@ -436,7 +444,7 @@ img {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 32px;
+  gap: 20px;
 }
 
 .logo {
@@ -449,9 +457,16 @@ img {
 }
 
 .logo-img {
-  height: 40px;
+  height: 45px;
   width: auto;
-  object-fit: contain;
+  max-width: 100%;
+  transition: var(--transition);
+}
+
+@media (max-width: 1024px) {
+  .logo-img {
+    height: 45px;
+  }
 }
 
 .logo-icon {
@@ -506,18 +521,27 @@ img {
 }
 
 .dropdown-content {
-  display: none;
   position: absolute;
   top: 100%;
   left: 50%;
-  transform: translateX(-50%);
-  background-color: var(--white);
-  min-width: 260px;
+  transform: translateX(-50%) translateY(10px);
+  background: var(--white);
+  min-width: 240px;
+  max-width: 90vw;
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  border-radius: var(--radius-md);
+  padding: 12px 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition);
   z-index: 1000;
-  margin-top: 10px;
-  border: 1px solid var(--neutral-300);
+}
+
+/* Ensure the last dropdown doesn't overflow right */
+.nav-dropdown:last-child .dropdown-content {
+  left: auto;
+  right: 0;
+  transform: translateY(10px);
 }
 
 /* Invisible bridge to keep hover active */
@@ -532,8 +556,13 @@ img {
 }
 
 .nav-dropdown:hover .dropdown-content {
-  display: block;
-  animation: fadeInDown 0.3s ease;
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.nav-dropdown:last-child:hover .dropdown-content {
+  transform: translateY(0);
 }
 
 .dropdown-content a {
@@ -541,7 +570,7 @@ img {
   padding: 14px 24px;
   text-decoration: none;
   display: block;
-  font-size: 0.9rem;
+  font-size: 1.3rem;
   font-weight: 500;
   transition: var(--transition);
   border-bottom: 1px solid var(--neutral-200);
@@ -570,20 +599,223 @@ img {
   height: 0;
   margin-left: 5px;
   vertical-align: middle;
-  border-top: 4px solid currentColor;
-  border-right: 4px solid transparent;
   border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid currentColor;
+  transition: var(--transition);
 }
 
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -10px);
+.nav-dropdown:hover .arrow-down {
+  transform: rotate(180deg);
+}
+
+/* ─── DROPDOWN GRID (MEGA MENU STYLE) ────────── */
+.dropdown-content--wide {
+  min-width: 650px !important;
+  padding: 25px !important;
+  left: 50% !important;
+  transform: translateX(-50%) translateY(10px) !important;
+}
+
+.dropdown-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+}
+
+.dropdown-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-group-title {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--brand-600);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 1px;
+  padding-bottom: 1px;
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.dropdown-group a {
+  padding: 8px 0 !important;
+  border-bottom: none !important;
+  font-size: 1.4rem !important;
+  font-weight: 600 !important;
+  color: var(--text-secondary) !important;
+}
+
+.dropdown-group a:hover {
+  background: transparent !important;
+  color: var(--brand-600) !important;
+  transform: translateX(5px);
+}
+
+@media (max-width: 991px) {
+  .dropdown-content--wide {
+    min-width: 100% !important;
+    position: static !important;
+    transform: none !important;
+    box-shadow: none !important;
+    padding: 15px !important;
+    background: rgba(255, 255, 255, 0.35) !important;
   }
 
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
+  .dropdown-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .dropdown-group-title {
+    color: #0033a0;
+    border-bottom-color: rgba(0, 51, 160, 0.15);
+  }
+
+  .dropdown-group a {
+    color: #ffffff !important;
+  }
+}
+
+/* Submenús navbar: colapsable móvil / tablet (≤1024px) — Patologías, Servicios, Información paciente */
+.nav-patologias-toggle,
+.nav-servicios-toggle,
+.nav-paciente-toggle {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 10px 18px;
+  border-radius: 100px;
+  transition: var(--transition);
+}
+
+.nav-patologias-toggle:hover,
+.nav-servicios-toggle:hover,
+.nav-paciente-toggle:hover {
+  color: var(--white);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-patologias-toggle__chevron,
+.nav-servicios-toggle__chevron,
+.nav-paciente-toggle__chevron {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid currentColor;
+  transition: transform 0.2s ease;
+}
+
+.nav-dropdown--patologias.is-open .nav-patologias-toggle__chevron,
+.nav-dropdown--servicios.is-open .nav-servicios-toggle__chevron,
+.nav-dropdown--paciente.is-open .nav-paciente-toggle__chevron {
+  transform: rotate(180deg);
+}
+
+@media (max-width: 1024px) {
+
+  .nav-dropdown--patologias>.nav-link--patologias-desktop,
+  .nav-dropdown--servicios>.nav-link--servicios-desktop,
+  .nav-dropdown--paciente>.nav-link--paciente-desktop {
+    display: none !important;
+  }
+
+  .nav-patologias-toggle,
+  .nav-servicios-toggle,
+  .nav-paciente-toggle {
+    display: inline-flex;
+  }
+
+  .nav-dropdown--patologias:not(.is-open):hover .dropdown-content,
+  .nav-dropdown--servicios:not(.is-open):hover .dropdown-content,
+  .nav-dropdown--paciente:not(.is-open):hover .dropdown-content {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    max-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .nav-dropdown--patologias .dropdown-content.dropdown-content--wide {
+    position: static !important;
+    left: auto !important;
+    transform: none !important;
+    min-width: 100% !important;
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden;
+    margin: 0;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    transition: max-height 0.35s ease, opacity 0.25s ease, visibility 0.25s ease, padding 0.25s ease;
+  }
+
+  .nav-dropdown--patologias.is-open .dropdown-content.dropdown-content--wide {
+    max-height: 75vh !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    overflow-y: auto !important;
+    padding: 15px !important;
+    margin-top: 8px;
+  }
+
+  .nav-dropdown--servicios .dropdown-content:not(.dropdown-content--wide),
+  .nav-dropdown--paciente .dropdown-content:not(.dropdown-content--wide) {
+    position: static !important;
+    left: auto !important;
+    transform: none !important;
+    min-width: 100% !important;
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden;
+    margin: 0;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    box-shadow: none !important;
+    transition: max-height 0.35s ease, opacity 0.25s ease, visibility 0.25s ease, padding 0.25s ease;
+  }
+
+  .nav-dropdown--servicios.is-open .dropdown-content:not(.dropdown-content--wide),
+  .nav-dropdown--paciente.is-open .dropdown-content:not(.dropdown-content--wide) {
+    max-height: 70vh !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    overflow-y: auto !important;
+    padding: 12px 0 !important;
+    margin-top: 8px;
+    border-radius: var(--radius-lg);
+    background: rgb(85 109 160 / 82%) !important;
+  }
+
+  .nav-dropdown--servicios.is-open .dropdown-content a,
+  .nav-dropdown--paciente.is-open .dropdown-content a {
+    color: #ffffff !important;
+    border-bottom-color: rgba(0, 0, 0, 0.08);
+  }
+}
+
+@media (min-width: 1025px) {
+
+  .nav-patologias-toggle,
+  .nav-servicios-toggle,
+  .nav-paciente-toggle {
+    display: none !important;
   }
 }
 
@@ -692,7 +924,7 @@ img {
 
 .hero-title {
   font-family: var(--font-display);
-  font-size: clamp(2.6rem, 6vw, 4.4rem);
+  font-size: clamp(2rem, 5vw, 4rem);
   font-weight: 800;
   line-height: 1.1;
   color: var(--white);
@@ -799,7 +1031,7 @@ img {
 
 .services-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
   gap: 24px;
 }
 
@@ -812,6 +1044,10 @@ img {
   overflow: hidden;
   transition: var(--transition);
   transition-delay: calc(var(--i, 0) * 0.08s);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .service-card::before {
@@ -870,25 +1106,22 @@ img {
 }
 
 .service-icon {
-  width: 56px;
-  height: 56px;
+  width: 80px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--icon-color, var(--brand-teal)) 12%, transparent);
-  color: var(--icon-color, var(--brand-teal));
-  margin-bottom: 20px;
+  margin: 0 auto 20px;
 }
 
 .service-card--featured .service-icon {
-  background: rgba(255, 255, 255, 0.15);
-  color: var(--white);
+  background: transparent;
 }
 
-.service-icon svg {
-  width: 28px;
-  height: 28px;
+.service-icon-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .service-name {
@@ -927,6 +1160,7 @@ img {
   color: var(--text-secondary);
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
 }
 
@@ -1052,16 +1286,76 @@ img {
   pointer-events: none;
 }
 
+.filter-scroll-wrapper {
+  position: relative;
+  width: 100%;
+}
+
 .filter-tabs {
   display: flex;
   gap: 10px;
   overflow-x: auto;
-  padding-bottom: 8px;
+  padding: 4px 0 12px 0;
   scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .filter-tabs::-webkit-scrollbar {
   display: none;
+}
+
+.filter-indicator {
+  position: absolute;
+  top: 4px;
+  bottom: 12px;
+  width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+}
+
+.filter-indicator svg {
+  width: 32px;
+  height: 32px;
+  color: var(--white);
+  background: var(--brand-600);
+  border-radius: 50%;
+  padding: 6px;
+  box-shadow: var(--shadow-md);
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.filter-indicator svg:hover {
+  background: var(--brand-teal-dk);
+  transform: scale(1.1);
+}
+
+.filter-indicator--left {
+  left: -10px;
+  background: linear-gradient(to right, var(--white) 40%, transparent);
+  justify-content: flex-start;
+}
+
+.filter-indicator--right {
+  right: -10px;
+  background: linear-gradient(to left, var(--white) 40%, transparent);
+  justify-content: flex-end;
+}
+
+.filter-scroll-wrapper.has-scroll-left .filter-indicator--left {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.filter-scroll-wrapper.has-scroll-right .filter-indicator--right {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .filter-btn {
@@ -1091,7 +1385,7 @@ img {
 
 .doctors-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
   gap: 30px;
 }
 
@@ -1582,14 +1876,14 @@ img {
 
 /* ─── FOOTER ─────────────────────────────────── */
 .footer {
-  background: #dfefece5;
-  padding-top: 72px;
+  background: #00ae9a;
+  padding-top: 50px;
 }
 
 .footer-inner {
   display: grid;
-  grid-template-columns: 1.3fr 1fr;
-  gap: 80px;
+  grid-template-columns: 1fr 1.2fr 1.8fr;
+  gap: 60px;
   padding-bottom: 56px;
 }
 
@@ -1598,7 +1892,7 @@ img {
 }
 
 .footer-desc {
-  color: rgb(71, 85, 105);
+  color: #fff;
   font-size: 0.88rem;
   line-height: 1.7;
   margin-top: 16px;
@@ -1614,7 +1908,7 @@ img {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #00B49C, #009984);
+  background: linear-gradient(135deg, #002d8e, #0033a0);
   color: var(--white);
   box-shadow: 0 8px 32px rgba(0, 180, 156, 0.35);
   border: none;
@@ -1635,7 +1929,26 @@ img {
 .footer-links {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  gap: 20px;
+}
+
+.footer-map {
+  width: 100%;
+}
+
+.footer-map-container {
+  width: 100%;
+  height: 250px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 5px solid #00B49C;
+  box-shadow: var(--shadow-sm);
+}
+
+.footer-map-container iframe {
+  width: 100% !important;
+  height: 100% !important;
+  border: 0;
 }
 
 .footer-col {
@@ -1655,15 +1968,15 @@ img {
 }
 
 .footer-col a {
-  color: rgb(0 174 154);
+  color: rgba(255, 255, 255, 0.80);
   text-decoration: none;
   font-size: 0.87rem;
   transition: var(--transition);
 }
 
 .footer-col a:hover {
-  color: var(--brand-teal);
-  color: #00ae97;
+  color: var(--white);
+  opacity: 1;
 }
 
 .footer-final {
@@ -1678,6 +1991,7 @@ img {
 
 .footer-highlight {
   color: #00ac95;
+  font-weight: 800;
 }
 
 .footer-bottom .container {
@@ -1691,6 +2005,169 @@ img {
 .footer-bottom p {
   color: rgba(255, 255, 255, 0.66);
   font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+/* ─── FOOTER STYLE TOGGLE ───────────────────── */
+.footer-bottom-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.footer-style-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: 100px;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.toggle-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 22px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  transition: .4s;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 2px;
+  background-color: white;
+  transition: .4s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:checked+.slider {
+  background-color: var(--brand-teal);
+}
+
+input:focus+.slider {
+  box-shadow: 0 0 1px var(--brand-teal);
+}
+
+input:checked+.slider:before {
+  transform: translateX(20px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* ─── FOOTER LIGHT MODE OVERRIDES ───────────── */
+footer.footer {
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+footer.footer--light {
+  background: #ffffff !important;
+  border-top: 1px solid #e2e8f0;
+}
+
+footer.footer--light .footer-desc {
+  color: #475569 !important;
+}
+
+footer.footer--light .footer-col h5 {
+  color: #0033a0 !important;
+}
+
+footer.footer--light .footer-col a {
+  color: #64748b !important;
+}
+
+footer.footer--light .footer-col a:hover {
+  color: #00b49c !important;
+}
+
+footer.footer--light .footer-map-container {
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+footer.footer--light .footer-bottom {
+  background-color: #f8fafc !important;
+  border-top: 1px solid #e2e8f0 !important;
+}
+
+footer.footer--light .footer-bottom p {
+  color: #64748b !important;
+}
+
+footer.footer--light .footer-highlight {
+  color: #00b49c !important;
+}
+
+footer.footer--light .footer-style-toggle {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+footer.footer--light .toggle-label {
+  color: #475569 !important;
+}
+
+footer.footer--light .social-btn {
+  background: #f1f5f9;
+  color: #0033a0;
+  box-shadow: none;
+  border: 1px solid #e2e8f0;
+}
+
+footer.footer--light .social-btn:hover {
+  background: #0033a0;
+  color: #fff;
+  transform: translateY(-3px);
+}
+
+@media (max-width: 768px) {
+  .footer-bottom-content {
+    justify-content: center;
+    text-align: center;
+  }
 }
 
 /* ─── RESPONSIVE ────────────────────────────── */
@@ -1717,7 +2194,28 @@ img {
   }
 }
 
+@media (max-width: 1024px) {
+  .hero-title {
+    font-size: 2.8rem;
+  }
+
+  .nav-links {
+    gap: 15px;
+  }
+
+  /* Glassmorphism for navbar scrolled on tablet */
+  .navbar.scrolled {
+    background: #5171b27d;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+}
+
 @media (max-width: 768px) {
+  body.nav-open .top-bar {
+    display: none !important;
+  }
+
   .top-bar-inner {
     justify-content: space-between;
     gap: 8px;
@@ -1732,14 +2230,21 @@ img {
   }
 
   .top-bar-right {
-    gap: 12px;
+    gap: 70px;
   }
 
 
 
   /* Offset navbar to avoid overlapping top bar */
   .navbar {
-    top: 45px;
+    top: 80px;
+  }
+
+  body.nav-open .navbar {
+    top: 0 !important;
+    padding-top: 35px;
+    backdrop-filter: blur(0.1px);
+    background: #5171b200;
   }
 
   .navbar.scrolled {
@@ -1757,7 +2262,6 @@ img {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(15, 23, 42, 0.97);
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -1767,10 +2271,59 @@ img {
 
   .nav-links.open {
     display: flex;
+    justify-content: flex-start;
+    padding-top: 30%;
+    background: #4d6491e3 !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px);
   }
 
   .nav-link {
     font-size: 1.4rem;
+    color: #e9e9e9;
+  }
+
+  .nav-link:hover {
+    color: #009984;
+    background: rgba(0, 153, 132, 0.1);
+  }
+
+  .nav-patologias-toggle,
+  .nav-servicios-toggle,
+  .nav-paciente-toggle {
+    font-size: 1.4rem;
+    justify-content: center;
+    color: #ffffff;
+  }
+
+  .nav-patologias-toggle:hover,
+  .nav-servicios-toggle:hover,
+  .nav-paciente-toggle:hover {
+    color: #f5f7f7;
+    background: rgb(0 153 132 / 76%);
+  }
+
+  /* Glassmorphism for navbar scrolled on mobile */
+  .navbar.scrolled {
+    background: #5171b27d;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  /* Fix btn-nav visibility in mobile glassmorphism menu */
+  .nav-links .btn-nav {
+    background: #009984;
+    color: #fff !important;
+  }
+
+  .nav-dropdown--patologias,
+  .nav-dropdown--servicios,
+  .nav-dropdown--paciente {
+    width: 86%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .hamburger {
@@ -1825,13 +2378,20 @@ img {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .hero-scroll {
-    display: none;
+  .hero-stats {
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
-  .footer-bottom .container {
-    flex-direction: column;
+  .stat-item {
+    min-width: 120px;
     text-align: center;
+  }
+
+  .hero-content {
+
+    padding-top: 150px;
   }
 }
 
@@ -1842,6 +2402,21 @@ img {
 
   .btn-sustentabilidad {
     display: none;
+  }
+
+  .navbar {
+    top: 120px;
+  }
+
+  .navbar.scrolled {
+    top: 0;
+    background: #5171b27d;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .hero-content {
+    padding-top: 200px;
   }
 
   .hero-title {
@@ -1872,29 +2447,6 @@ img {
 
   .about-img-accent {
     width: 70%;
-  }
-
-  .footer-links {
-    grid-template-columns: 1fr;
-  }
-
-  .navbar {
-    top: 45px;
-  }
-
-  .navbar.scrolled {
-    top: 0;
-  }
-}
-
-@media (max-width: 480px) {
-  .hero-actions {
-    flex-direction: column;
-  }
-
-  .hero-actions .btn {
-    width: 100%;
-    justify-content: center;
   }
 
   .footer-links {
@@ -1972,20 +2524,24 @@ img {
 .modal-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(12px);
-  z-index: -1;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 0;
 }
 
 .modal-container {
-  background: var(--white);
   width: 100%;
   max-width: 800px;
   max-height: 90vh;
   border-radius: var(--radius-xl);
   position: relative;
+  z-index: 1;
   overflow-y: auto;
   box-shadow: var(--shadow-lg);
+  background: #5171b27d;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   transform: scale(0.9) translateY(20px);
   transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
 }
@@ -1996,14 +2552,14 @@ img {
 
 .modal-close {
   position: absolute;
-  top: 24px;
-  right: 24px;
+  top: 8px;
+  right: 8px;
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: var(--neutral-100);
+  background: #009984;
   border: none;
-  color: var(--text-primary);
+  color: #f8f8f8;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2025,6 +2581,7 @@ img {
 
 .modal-content {
   padding: 60px 44px;
+  background: transparent;
 }
 
 /* Loader */
@@ -2168,9 +2725,17 @@ img {
 }
 
 .modal-actions {
-  margin-top: 20px;
-  padding-top: 30px;
-  border-top: 1px solid var(--neutral-200);
+  margin-top: 1px !important;
+  padding-top: 1px !important;
+  border-top: none;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.modal-actions .btn {
+  margin: 0 auto !important;
 }
 
 /* Response for small screens */
@@ -2285,5 +2850,71 @@ img {
 @media (max-width: 600px) {
   .patologias-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* User Overrides */
+@media (max-width: 480px) {
+  .btn-nav.btn-convenios {
+    padding: 8px 20px;
+  }
+
+  .top-bar-left {
+    gap: 8px;
+  }
+
+  .hero-badge {
+    margin-top: 5px;
+  }
+
+  .top-bar-item svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .hero-desc {
+    margin-bottom: 20px;
+  }
+
+  .hero-title {
+    font-size: 1.9rem;
+  }
+}
+
+/* ─── DROPDOWN CONTENT DARK TEXT FOR GLASSMORPHISM ── */
+@media (max-width: 1024px) {
+
+  .nav-dropdown--servicios .dropdown-content a,
+  .nav-dropdown--paciente .dropdown-content a {
+    color: #0f172a !important;
+    border-bottom-color: rgba(0, 0, 0, 0.08);
+  }
+
+  .nav-dropdown--servicios .dropdown-content a:hover,
+  .nav-dropdown--paciente .dropdown-content a:hover {
+    color: #009984 !important;
+    background-color: rgba(0, 153, 132, 0.08) !important;
+  }
+
+  .nav-dropdown--servicios.is-open .dropdown-content:not(.dropdown-content--wide),
+  .nav-dropdown--paciente.is-open .dropdown-content:not(.dropdown-content--wide) {
+    background: rgba(255, 255, 255, 0.35) !important;
+  }
+
+  .nav-dropdown--patologias.is-open .dropdown-content.dropdown-content--wide {
+    background: rgba(255, 255, 255, 0.35) !important;
+  }
+
+  .dropdown-group-title {
+    color: #0033a0 !important;
+    border-bottom-color: rgba(0, 51, 160, 0.15);
+  }
+
+  .dropdown-group a {
+    color: #ffffff !important;
+  }
+
+  .dropdown-group a:hover {
+    color: #009984 !important;
   }
 }

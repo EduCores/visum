@@ -2,6 +2,11 @@
    VISUM – MEDICINA OCULAR  |  main.js
    ══════════════════════════════════════════════ */
 
+// ─── EMAILJS INIT ───────────────────────────
+(function () {
+  emailjs.init("AnKHWK_DxGqgbChjb");
+})();
+
 // ─── NAVBAR SCROLL ───────────────────────────
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
@@ -11,16 +16,66 @@ window.addEventListener('scroll', () => {
 // ─── MOBILE HAMBURGER ────────────────────────
 const hamburger = document.getElementById('hamburger');
 const navLinks = document.getElementById('nav-links');
+const navSubmenus = [
+  { dropdown: document.querySelector('.nav-dropdown--patologias'), toggle: document.getElementById('nav-patologias-toggle') },
+  { dropdown: document.querySelector('.nav-dropdown--servicios'), toggle: document.getElementById('nav-servicios-toggle') },
+  { dropdown: document.querySelector('.nav-dropdown--paciente'), toggle: document.getElementById('nav-paciente-toggle') }
+];
+
+function closeAllNavSubmenus() {
+  navSubmenus.forEach(({ dropdown, toggle }) => {
+    dropdown?.classList.remove('is-open');
+    toggle?.setAttribute('aria-expanded', 'false');
+  });
+}
+
+function setupNavSubmenuToggle(dropdown, toggle) {
+  if (!dropdown || !toggle) return;
+  toggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const wasOpen = dropdown.classList.contains('is-open');
+    closeAllNavSubmenus();
+    if (!wasOpen) {
+      dropdown.classList.add('is-open');
+      toggle.setAttribute('aria-expanded', 'true');
+    }
+  });
+}
+
 hamburger.addEventListener('click', () => {
   const open = navLinks.classList.toggle('open');
   hamburger.setAttribute('aria-expanded', open);
+  document.body.classList.toggle('nav-open', open);
   document.body.style.overflow = open ? 'hidden' : '';
+  if (!open) closeAllNavSubmenus();
 });
 navLinks.querySelectorAll('.nav-link, .btn-nav').forEach(link => {
   link.addEventListener('click', () => {
     navLinks.classList.remove('open');
+    document.body.classList.remove('nav-open');
     document.body.style.overflow = '';
   });
+});
+
+navSubmenus.forEach(({ dropdown, toggle }) => setupNavSubmenuToggle(dropdown, toggle));
+
+navLinks.querySelectorAll('.nav-dropdown .dropdown-content a').forEach(link => {
+  link.addEventListener('click', () => {
+    closeAllNavSubmenus();
+    navLinks.classList.remove('open');
+    document.body.classList.remove('nav-open');
+    document.body.style.overflow = '';
+  });
+});
+
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 1024) {
+    closeAllNavSubmenus();
+    navLinks.classList.remove('open');
+    document.body.classList.remove('nav-open');
+    document.body.style.overflow = '';
+  }
 });
 
 // ─── SCROLL REVEAL ──────────────────────────
@@ -114,10 +169,17 @@ function handleSubmit(e) {
   text.textContent = 'Enviando...';
   icon.textContent = '⏳';
 
-  setTimeout(() => {
-    document.getElementById('contact-form').classList.add('hidden');
-    document.getElementById('form-success').classList.remove('hidden');
-  }, 1800);
+  emailjs.sendForm('service_eletrff', 'template_e6p7wua', e.target)
+    .then(() => {
+      document.getElementById('contact-form').classList.add('hidden');
+      document.getElementById('form-success').classList.remove('hidden');
+    }, (error) => {
+      console.log('FAILED...', error);
+      alert('Hubo un error al enviar el mensaje. Por favor, inténtalo de nuevo o contáctanos por teléfono.');
+      btn.disabled = false;
+      text.textContent = 'Enviar Solicitud';
+      icon.textContent = '→';
+    });
 }
 
 function resetForm() {
@@ -187,89 +249,9 @@ if (filterBtns) {
   });
 }
 
-// ─── PATOLOGIA DATA ─────────────────────────
-const patologiasData = {
-  'pat-cataratas': {
-    title: 'Cirugía de Cataratas',
-    desc: 'La catarata es la opacidad del lente natural del ojo (cristalino). Nuestra cirugía de alta precisión reemplaza este lente por uno artificial premium para devolverle la nitidez.',
-    details: [
-      'Procedimiento ambulatorio de 15-20 minutos.',
-      'Anestesia tópica (gotas), sin inyecciones.',
-      'Recuperación visual rápida en 24-48 horas.',
-      'Implante de lentes intraoculares multifocales.'
-    ]
-  },
-  'pat-glaucoma': {
-    title: 'Cirugía de Glaucoma',
-    desc: 'El glaucoma es una enfermedad que daña el nervio óptico de forma silenciosa. Diagnosticamos y tratamos de forma temprana para proteger su visión.',
-    details: [
-      'Tratamiento con SLT (Trabeculoplastía Láser).',
-      'Cirugías filtrantes de alta precisión.',
-      'Monitoreo continuo de presión intraocular.',
-      'Prevención de daño irreversible al nervio óptico.'
-    ]
-  },
-  'pat-oculoplastica': {
-    title: 'Cirugía Oculoplástica',
-    desc: 'Cirugía plástica ocular enfocada en la función y estética de los párpados, vía lagrimal y órbita.',
-    details: [
-      'Corrección de párpados caídos (ptosis).',
-      'Tratamiento de bolsas y exceso de piel.',
-      'Cirugía de vía lagrimal obstruida.',
-      'Reconstrucción post-trauma o tumores.'
-    ]
-  },
-  'pat-estetica': {
-    title: 'Estética Oculofacial',
-    desc: 'Procedimientos para rejuvenecer la mirada y el tercio superior del rostro con un enfoque natural y armonioso.',
-    details: [
-      'Aplicación de toxina botulínica.',
-      'Rellenos con ácido hialurónico.',
-      'Blefaroplastia no quirúrgica láser.',
-      'Tratamientos para ojeras y Arrugas.'
-    ]
-  },
-  'pat-retina': {
-    title: 'Retina y Vitreo',
-    desc: 'Atención especializada para las enfermedades que afectan la capa interna del ojo, fundamental para la visión central y detalle.',
-    details: [
-      'Manejo de Retinopatía Diabética.',
-      'Cirugía de Desprendimiento de Retina.',
-      'Tratamiento de Degeneración Macular (DMAE).',
-      'Inyecciones intravítreas anti-angiogénicas.'
-    ]
-  },
-  'pat-general': {
-    title: 'Oftalmología General',
-    desc: 'El primer paso para una buena salud visual. Realizamos chequeos completos para detectar cualquier anomalía a tiempo.',
-    details: [
-      'Examen de agudeza visual y refracción.',
-      'Detección de ojo seco y alergias oculares.',
-      'Control de presión ocular preventivo.',
-      'Receta de lentes graduados de alta precisión.'
-    ]
-  },
-  'pat-refractiva': {
-    title: 'Cirugía Refractiva',
-    desc: 'Libérese de los anteojos. Utilizamos tecnología láser avanzada para corregir defectos ópticos de forma permanente.',
-    details: [
-      'Técnica LASIK y PRK con laser excimer.',
-      'Corrección de miopía, astigmatismo e hipermetropía.',
-      'Procedimiento de 10 minutos por ojo.',
-      'Independencia total de lentes de contacto.'
-    ]
-  },
-  'pat-cornea': {
-    title: 'Córnea y Superficie',
-    desc: 'Especialistas en la salud de la ventana frontal del ojo y las capas que lo mantienen hidratado y protegido.',
-    details: [
-      'Tratamiento avanzado de Queratocono.',
-      'Manejo de Úlceras y Distrofias corneales.',
-      'Protocolos modernos para Ojo Seco severo.',
-      'Trasplante de córnea (si es requerido).'
-    ]
-  }
-};
+
+// ─── END OF LEGACY DATA CLEANUP ─────────────
+
 
 // ─── DOCTOR DATA ────────────────────────────
 const doctorsData = {
@@ -418,6 +400,20 @@ const doctorsData = {
     experience: [
       'Reconocida trayectoria en el manejo de visión infantil.'
     ]
+  },
+  'dr-miranda': {
+    name: 'Dra. Karin Miranda',
+    title: 'Especialista en Oftalmología General',
+    img: 'https://www.visum.cl/content/uploads/2020/05/visum-doctor.jpg',
+    bio: 'Médico Cirujano con amplia trayectoria en el diagnóstico y tratamiento integral de patologías oculares, dedicada a la prevención y salud visual de sus pacientes.',
+    education: [
+      'Médico Cirujano, Universidad de Chile.',
+      'Especialidad en Oftalmología.'
+    ],
+    experience: [
+      'Atención integral de adultos y niños.',
+      'Control preventivo y patologías oftalmológicas comunes.'
+    ]
   }
 };
 
@@ -437,7 +433,7 @@ const pacienteInfoData = {
     title: 'Presupuesto',
     desc: 'Solicite un presupuesto detallado para sus procedimientos quirúrgicos o exámenes diagnósticos.',
     details: [
-      'Presupuestos transparentes sin costos ocultos.',
+      'Presupuestos transparentes sin costos extra.',
       'Detalle de insumos, honorarios médicos y derechos de sala.',
       'Opciones de financiamiento y facilidades de pago.',
       'Vigencia de presupuestos por 30 días.'
@@ -451,6 +447,16 @@ const pacienteInfoData = {
       'Transferencia electrónica bancaria.',
       'Efectivo directamente en nuestras sucursales.',
       'Convenios vigentes con Isapres y Fonasa (según prestación).'
+    ]
+  },
+  'convenios': {
+    title: 'Convenios y Seguros',
+    desc: 'Contamos con convenios vigentes con las principales Isapres y fondos de salud del país.',
+    details: [
+      'Atención mediante bonos I-Med (Isapres y Fonasa).',
+      'Convenios con seguros complementarios de salud.',
+      'Descuentos especiales para convenios corporativos.',
+      'Presupuestos preferenciales para pacientes en convenio.'
     ]
   },
   'quirurgica': {
@@ -512,6 +518,309 @@ const pacienteInfoData = {
       'Medición de presión intraocular.',
       'Receta para lentes y certificados médicos.'
     ]
+  },
+  'privacidad': {
+    title: 'Política de Privacidad',
+    desc: 'En Visum, la confidencialidad de su información es nuestra prioridad. Cumplimos con los más altos estándares de protección de datos personales.',
+    details: [
+      'Resguardo estricto de su ficha clínica electrónica.',
+      'Uso de datos exclusivamente para fines médicos y administrativos.',
+      'Derecho de acceso, rectificación y cancelación de sus datos.',
+      'Protocolos de ciberseguridad avanzada en nuestros sistemas.'
+    ]
+  },
+  'terminos': {
+    title: 'Términos de Uso',
+    desc: 'Al utilizar nuestros servicios y plataforma digital, usted acepta los términos y condiciones diseñados para garantizar una atención segura y eficiente.',
+    details: [
+      'Compromiso de entrega de información veraz por parte del paciente.',
+      'Propiedad intelectual de los contenidos del sitio web.',
+      'Limitaciones de responsabilidad sobre enlaces externos.',
+      'Condiciones de uso de la plataforma de agendamiento en línea.'
+    ]
+  },
+  'consentimiento': {
+    title: 'Consentimiento Informado',
+    desc: 'Garantizamos que cada paciente reciba información clara y detallada antes de cualquier procedimiento médico o quirúrgico.',
+    details: [
+      'Explicación detallada de beneficios y riesgos de cada cirugía.',
+      'Alternativas de tratamiento disponibles para su condición.',
+      'Espacio para resolver todas sus dudas con el especialista.',
+      'Firma de documentos legales previa a cualquier intervención.'
+    ]
+  },
+  'especialidades-info': {
+    title: 'Nuestras Especialidades',
+    desc: 'Visum ofrece una cobertura integral en oftalmología, desde controles generales hasta cirugías de alta complejidad.',
+    details: [
+      'Cataratas y Cirugía con Lentes Premium.',
+      'Cirugía Refractiva Láser (LASIK/PRK).',
+      'Manejo avanzado de Glaucoma y Retina.',
+      'Oculoplastía funcional y Estética Oculofacial.',
+      'Exámenes pre-operatorios con tecnología de vanguardia.'
+    ]
+  },
+  'paciente-resumen': {
+    title: 'Información al Paciente',
+    desc: 'Todo lo que necesita saber para su atención en nuestra clínica, desde el agendamiento hasta sus derechos legales.',
+    details: [
+      'Procesos de agendamiento y confirmación de citas.',
+      'Gestión de presupuestos y medios de pago.',
+      'Preparación para cirugías y cuidados post-operatorios.',
+      'Marco legal de derechos y deberes del paciente.'
+    ]
+  }
+};
+
+const patologiasData = {
+  // Vicios de Refracción
+  'miopia': {
+    title: 'Miopía',
+    desc: 'Dificultad para ver objetos lejanos debido a un ojo más largo de lo normal o una córnea muy curva.',
+    details: [
+      'Visión borrosa de lejos y nítida de cerca.',
+      'Necesidad de entrecerrar los ojos para enfocar.',
+      'Fatiga ocular y posibles dolores de cabeza.',
+      'Tratamiento con lentes cóncavos o cirugía láser LASIK/PRK.',
+      'Se recomienda control anual para monitorear cambios.'
+    ]
+  },
+  'hipermetropia': {
+    title: 'Hipermetropía',
+    desc: 'Dificultad para enfocar objetos cercanos porque la imagen se forma detrás de la retina.',
+    details: [
+      'Visión borrosa de cerca, y en grados altos, de lejos.',
+      'Dolor de cabeza relacionado con el esfuerzo visual.',
+      'Ardor o fatiga ocular tras lectura prolongada.',
+      'Corregible con lentes convexos o cirugía refractiva.',
+      'Frecuente en niños, tendiendo a disminuir con el crecimiento.'
+    ]
+  },
+  'astigmatismo': {
+    title: 'Astigmatismo',
+    desc: 'Visión distorsionada a todas las distancias causada por una curvatura irregular de la córnea.',
+    details: [
+      'Visión con sombras o contornos dobles.',
+      'Dificultad para ver detalles finos de cerca y lejos.',
+      'Sensibilidad a la luz (fotofobia).',
+      'Uso de lentes cilíndricos o tóricos para corrección.',
+      'Puede presentarse solo o asociado a miopía/hipermetropía.'
+    ]
+  },
+  'presbicia': {
+    title: 'Presbicia',
+    desc: 'Pérdida gradual de la capacidad de enfocar de cerca debido al envejecimiento natural del cristalino.',
+    details: [
+      'Aparición típica después de los 40-45 años.',
+      'Necesidad de alejar los textos para poder leerlos.',
+      'Visión borrosa en condiciones de poca luz.',
+      'Tratamiento con lentes de lectura o multifocales.',
+      'Opciones quirúrgicas disponibles según evaluación.'
+    ]
+  },
+  // Segmento Anterior
+  'glaucoma': {
+    title: 'Glaucoma',
+    desc: 'Enfermedad del nervio óptico generalmente asociada a presión intraocular elevada, que puede causar ceguera irreversible.',
+    details: [
+      'Llamado "ladrón silencioso" por la falta de síntomas iniciales.',
+      'Pérdida progresiva de la visión periférica (visión de túnel).',
+      'Diagnóstico mediante tonometría y campo visual.',
+      'Tratamiento con gotas, láser o cirugía para bajar la presión.',
+      'El daño ya causado es irreversible, la detección precoz es clave.'
+    ]
+  },
+  'conjuntivitis': {
+    title: 'Conjuntivitis',
+    desc: 'Inflamación de la conjuntiva por causas virales, bacterianas o alérgicas.',
+    details: [
+      'Ojo rojo intenso con lagrimeo y sensación de arenilla.',
+      'Secreciones que pueden dejar los párpados pegados al despertar.',
+      'Picazón y ardor ocular constante.',
+      'Altamente contagiosa si es de origen viral o bacteriano.',
+      'Tratamiento específico según el tipo (antibióticos o antihistamínicos).'
+    ]
+  },
+  'ojo-seco': {
+    title: 'Ojo Seco',
+    desc: 'Falta de lubricación adecuada por mala calidad o insuficiente producción de lágrimas.',
+    details: [
+      'Ardor, picazón y pesadez en los párpados.',
+      'Sensación de cuerpo extraño dentro del ojo.',
+      'Visión borrosa que mejora al parpadear.',
+      'Agravado por el uso de pantallas y aire acondicionado.',
+      'Tratamiento con lágrimas artificiales y geles lubricantes.'
+    ]
+  },
+  'pterigion': {
+    title: 'Pterigión',
+    desc: 'Crecimiento de tejido carnoso sobre la córnea, asociado a exposición solar y viento.',
+    details: [
+      'Aparición de una "carnosidad" visible en el lado nasal.',
+      'Enrojecimiento recurrente e irritación crónica.',
+      'Sensación constante de basura en el ojo.',
+      'Puede causar astigmatismo si crece hacia el centro.',
+      'El tratamiento definitivo es la cirugía con autoinjerto.'
+    ]
+  },
+  // Segmento Posterior y Retina
+  'dmre': {
+    title: 'Degeneración Macular (DMRE)',
+    desc: 'Deterioro de la mácula que afecta la visión central fina necesaria para leer o conducir.',
+    details: [
+      'Líneas rectas que se ven onduladas o distorsionadas.',
+      'Aparición de una mancha oscura en el centro de la visión.',
+      'Dificultad para reconocer rostros o detalles finos.',
+      'Principal causa de pérdida visual en mayores de 60 años.',
+      'Tratamientos con vitaminas o inyecciones intravítreas.'
+    ]
+  },
+  'retinopatia': {
+    title: 'Retinopatía Diabética',
+    desc: 'Daño en los vasos sanguíneos de la retina causado por niveles altos de azúcar en sangre.',
+    details: [
+      'Visión borrosa y aparición de manchas flotantes.',
+      'Áreas oscuras o vacías en el campo visual.',
+      'Riesgo de hemorragia vítrea o desprendimiento de retina.',
+      'Control metabólico estricto es fundamental.',
+      'Requiere controles de fondo de ojo anuales obligatorios.'
+    ]
+  },
+  'desprendimiento': {
+    title: 'Desprendimiento de Retina',
+    desc: 'Emergencia médica donde la retina se separa de su tejido de soporte.',
+    details: [
+      'Aparición súbita de destellos de luz (fotopsias).',
+      'Lluvia de puntos negros flotantes (moscas volantes).',
+      'Sensación de una "cortina" negra tapando la visión.',
+      'Requiere cirugía urgente para evitar ceguera permanente.',
+      'No causa dolor, la pérdida visual es el síntoma principal.'
+    ]
+  },
+  'agujero-macular': {
+    title: 'Agujero Macular',
+    desc: 'Pequeña rotura en la mácula que causa distorsión severa en la visión central.',
+    details: [
+      'Pérdida de la visión central nítida.',
+      'Las líneas rectas parecen tener un hueco o estar quebradas.',
+      'Relacionado generalmente con la edad y tracción del vítreo.',
+      'Confirmación mediante examen de OCT.',
+      'El tratamiento de elección es la cirugía de Vitrectomía.'
+    ]
+  },
+  // Otras Patologías
+  'estrabismo': {
+    title: 'Estrabismo',
+    desc: 'Falta de alineación de los ojos, que apuntan en direcciones diferentes.',
+    details: [
+      'Desviación visible de uno o ambos ojos.',
+      'Visión doble (diplopía) en adultos.',
+      'Dificultad para calcular profundidades y distancias.',
+      'Tratamiento con anteojos, parches o cirugía muscular.',
+      'Fundamental tratar en la infancia para evitar ambliopía.'
+    ]
+  },
+  'ambliopia': {
+    title: 'Ambliopía (Ojo Vago)',
+    desc: 'Desarrollo visual deficiente en un ojo durante la niñez temprana.',
+    details: [
+      'Baja visión persistente a pesar del uso de lentes.',
+      'Suele afectar a un solo ojo, pasando desapercibido.',
+      'Tratamiento mediante oclusión (parche) del ojo sano.',
+      'Solo se puede corregir durante los primeros años de vida.',
+      'Detección precoz antes de los 7 años es determinante.'
+    ]
+  },
+  'blefaritis': {
+    title: 'Blefaritis',
+    desc: 'Inflamación crónica de los párpados debido a bacterias o disfunción glandular.',
+    details: [
+      'Párpados rojos, hinchados y con picazón.',
+      'Presencia de escamas o caspa en la base de las pestañas.',
+      'Ojos llorosos y con sensación de ardor.',
+      'Frecuente asociación con ojo seco y rosácea.',
+      'Requiere higiene palpebral diaria y persistente.'
+    ]
+  },
+  'uveitis': {
+    title: 'Uveítis',
+    desc: 'Inflamación de la úvea (capa media del ojo) que puede ser grave si no se trata.',
+    details: [
+      'Ojo rojo con dolor profundo y sensibilidad a la luz.',
+      'Visión borrosa y aparición de cuerpos flotantes.',
+      'Puede estar asociada a enfermedades autoinmunes.',
+      'Riesgo de complicaciones como glaucoma o cataratas.',
+      'Tratamiento urgente con corticoides bajo control médico.'
+    ]
+  }
+};
+
+const servicesData = {
+  'serv-general': {
+    title: 'Oftalmología General',
+    desc: 'Evaluación integral de la salud visual para pacientes de todas las edades, fundamental para la detección temprana de patologías.',
+    details: [
+      'Examen de agudeza visual y refracción.',
+      'Tonometría (medición de presión intraocular).',
+      'Evaluación detallada de fondo de ojo.',
+      'Receta médica para lentes y certificados.',
+      'Controles preventivos y detección de glaucoma.'
+    ]
+  },
+  'serv-cataratas': {
+    title: 'Cirugía de Cataratas',
+    desc: 'Recupere la claridad de su visión con la técnica de Facoemulsificación, el estándar de oro en cirugía oftalmológica moderna.',
+    details: [
+      'Procedimiento ambulatorio, indoloro y de rápida recuperación.',
+      'Implante de Lentes Intraoculares (LIO) de alta tecnología.',
+      'Corrección simultánea de presbicia y astigmatismo.',
+      'Uso de ultrasonido para fragmentar el cristalino opaco.',
+      'Disponible a través de convenio Fonasa PAD.'
+    ]
+  },
+  'serv-refractiva': {
+    title: 'Cirugía Refractiva Láser',
+    desc: 'Elimine la dependencia de anteojos y lentes de contacto mediante técnicas de alta precisión con tecnología láser excimer.',
+    details: [
+      'Tratamiento para Miopía, Astigmatismo e Hipermetropía.',
+      'Técnicas personalizadas LASIK y PRK.',
+      'Procedimiento rápido (aprox. 15 minutos por ojo).',
+      'Alta precisión y seguridad con seguimiento ocular.',
+      'Evaluación pre-operatoria exhaustiva incluida.'
+    ]
+  },
+  'serv-retina': {
+    title: 'Especialidad de Retina y Vítreo',
+    desc: 'Tratamiento avanzado para enfermedades que afectan la parte posterior del ojo y que pueden comprometer seriamente la visión.',
+    details: [
+      'Manejo de Retinopatía Diabética y Desprendimiento de Retina.',
+      'Tratamiento de Degeneración Macular Relacionada con la Edad (DMAE).',
+      'Inyecciones intravítreas de fármacos antiangiogénicos.',
+      'Fotocoagulación con láser de argón.',
+      'Cirugía de Vitrectomía para casos de alta complejidad.'
+    ]
+  },
+  'serv-oculoplastica': {
+    title: 'Oculoplástica y Estética Periocular',
+    desc: 'Cirugía reconstructiva y estética enfocada en los párpados, órbita y vía lagrimal, combinando salud y armonía facial.',
+    details: [
+      'Blefaroplastia funcional y cosmética (cirugía de párpados).',
+      'Corrección de Ptosis (párpados caídos).',
+      'Tratamiento de lagrimeo y obstrucción de vía lagrimal.',
+      'Procedimientos mínimamente invasivos.',
+      'Resultados naturales con enfoque en la salud ocular.'
+    ]
+  },
+  'serv-examen': {
+    title: 'Examen Visual Completo',
+    desc: 'Batería de pruebas diagnósticas con tecnología de vanguardia para un análisis profundo de la anatomía ocular.',
+    details: [
+      'Tomografía de Coherencia Óptica (OCT) de mácula y nervio.',
+      'Pentacam (Tomografía corneal y segmento anterior).',
+      'Biometría óptica con IOL Master para cálculo de lentes.',
+      'Campo Visual Computarizado.',
+      'Angiografía y Fotografía de fondo de ojo.'
+    ]
   }
 };
 
@@ -549,7 +858,7 @@ function fetchModalContent(type, id) {
   let content = '';
 
   switch (type) {
-    case 'doctor':
+    case 'doctor': {
       const doc = doctorsData[id];
       if (doc) {
         content = `
@@ -598,29 +907,31 @@ function fetchModalContent(type, id) {
         content = '<p>Médico no encontrado.</p>';
       }
       break;
+    }
 
-    case 'sustentabilidad':
-      content = `
-        <h2 class="section-title">Compromiso con el <span class="gradient-text">Planeta</span></h2>
-        <p class="section-desc">En Visum, la salud visual va de la mano con el cuidado de nuestro entorno. Hemos implementado un sistema integral de sustentabilidad que incluye:</p>
-        <ul class="service-features" style="margin-top: 24px;">
-          <li>Reducción del 40% en uso de papel mediante digitalización clínica.</li>
-          <li>Gestión responsable de residuos biológicos y químicos.</li>
-          <li>Iluminación LED de bajo consumo en todas nuestras instalaciones.</li>
-          <li>Programas de reciclaje de monturas y lentes para comunidades rurales.</li>
-        </ul>
-      `;
+    case 'servicio': {
+      const serv = servicesData[id];
+      if (serv) {
+        content = `
+          <h2 class="section-title">${serv.title.split(' ').slice(0, -1).join(' ')} <span class="gradient-text">${serv.title.split(' ').pop()}</span></h2>
+          <p class="section-desc">${serv.desc}</p>
+          <div class="profile-section" style="margin-top: 24px;">
+            <h3>Detalles del procedimiento:</h3>
+            <ul class="service-features" style="margin-top: 16px;">
+              ${serv.details.map(detail => `<li>${detail}</li>`).join('')}
+            </ul>
+          </div>
+          <div class="modal-actions">
+            <a href="https://agendaweb.salutem.cl/app/agenda-web/D4F6/clinica-2020/inicio" class="btn btn-primary" target="_blank" onclick="closeModal()">Agendar Especialista</a>
+          </div>
+        `;
+      } else {
+        content = '<p>Información del servicio no encontrada.</p>';
+      }
       break;
-    case 'servicio':
-      content = `
-        <h2 class="section-title">Detalle del <span class="gradient-text">Servicio</span></h2>
-        <p class="section-desc">Esta sección se está desarrollando para cargar los detalles específicos del tratamiento.</p>
-        <div style="margin-top: 30px; padding: 20px; background: var(--neutral-100); border-radius: var(--radius-md);">
-          <p><strong>Info:</strong> El ID del servicio seleccionado es ${id}. Estamos integrando protocolos médicos y tiempos de recuperación.</p>
-        </div>
-      `;
-      break;
-    case 'patologia':
+    }
+
+    case 'patologia': {
       const pat = patologiasData[id];
       if (pat) {
         content = `
@@ -640,7 +951,9 @@ function fetchModalContent(type, id) {
         content = '<p>Información de patología no encontrada.</p>';
       }
       break;
-    case 'paciente-info':
+    }
+
+    case 'paciente-info': {
       const info = pacienteInfoData[id];
       if (info) {
         content = `
@@ -660,6 +973,7 @@ function fetchModalContent(type, id) {
         content = '<p>Información no encontrada.</p>';
       }
       break;
+    }
     default:
       content = '<h2>Información</h2><p>Contenido en desarrollo...</p>';
   }
@@ -668,32 +982,15 @@ function fetchModalContent(type, id) {
 }
 
 // ─── ATTACH MODAL TO INTERACTIONS ───────────
-document.querySelectorAll('.btn-sustentabilidad').forEach(btn => {
+document.querySelectorAll('[data-modal]').forEach(btn => {
   btn.addEventListener('click', (e) => {
     e.preventDefault();
-    openModal('sustentabilidad');
+    const type = btn.dataset.modalType || 'paciente-info';
+    const id = btn.dataset.modal;
+    openModal(type, id);
   });
 });
 
-document.querySelectorAll('.service-card .btn-nav').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    const cardId = btn.closest('.service-card').id;
-    if (cardId) {
-      e.preventDefault();
-      openModal('servicio', cardId);
-    }
-  });
-});
-
-document.querySelectorAll('.btn-patologia').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    const cardId = btn.closest('.patologia-card').id;
-    if (cardId) {
-      e.preventDefault();
-      openModal('patologia', cardId);
-    }
-  });
-});
 
 document.querySelectorAll('.dropdown-content a').forEach(link => {
   link.addEventListener('click', (e) => {
@@ -710,5 +1007,62 @@ document.getElementById('btn-servicios-hero')?.addEventListener('click', (e) => 
   openModal('paciente-info', 'presupuesto');
 });
 
+// ─── FILTER TABS SCROLL INDICATORS ──────────
+const filterTabs = document.getElementById('specialty-filters');
+const filterWrapper = document.querySelector('.filter-scroll-wrapper');
+const leftIndicator = document.querySelector('.filter-indicator--left');
+const rightIndicator = document.querySelector('.filter-indicator--right');
+
+if (filterTabs && filterWrapper) {
+  const updateIndicators = () => {
+    const scrollLeft = filterTabs.scrollLeft;
+    const maxScroll = filterTabs.scrollWidth - filterTabs.clientWidth;
+    
+    filterWrapper.classList.toggle('has-scroll-left', scrollLeft > 10);
+    filterWrapper.classList.toggle('has-scroll-right', scrollLeft < maxScroll - 10);
+  };
+
+  filterTabs.addEventListener('scroll', updateIndicators);
+  window.addEventListener('resize', updateIndicators);
+  
+  // Initial check
+  setTimeout(updateIndicators, 100);
+
+  leftIndicator?.addEventListener('click', () => {
+    filterTabs.scrollBy({ left: -200, behavior: 'smooth' });
+  });
+
+  rightIndicator?.addEventListener('click', () => {
+    filterTabs.scrollBy({ left: 200, behavior: 'smooth' });
+  });
+}
+
 // ─── INIT ────────────────────────────────────
-initReveal();
+// initReveal() already called at initial setup
+
+// ─── FOOTER STYLE SWITCH ───────────────────
+function initFooterStyleSwitch() {
+  const footer = document.querySelector('.footer');
+  const styleCheckbox = document.getElementById('footer-style-checkbox');
+
+  if (!footer || !styleCheckbox) return;
+
+  const savedStyle = localStorage.getItem('visum-footer-style');
+  if (savedStyle === 'light') {
+    footer.classList.add('footer--light');
+    styleCheckbox.checked = true;
+  }
+
+  styleCheckbox.addEventListener('change', () => {
+    if (styleCheckbox.checked) {
+      footer.classList.add('footer--light');
+      localStorage.setItem('visum-footer-style', 'light');
+    } else {
+      footer.classList.remove('footer--light');
+      localStorage.setItem('visum-footer-style', 'corporate');
+    }
+  });
+}
+
+// Final initialization
+initFooterStyleSwitch();
